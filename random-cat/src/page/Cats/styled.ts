@@ -1,4 +1,4 @@
-import styled from "styled-components";
+import styled, { CSSProperties } from "styled-components";
 
 export const Container = styled.div`
   display: flex;
@@ -15,6 +15,7 @@ export const Title = styled.h1`
   font-size: 4em;
   font-weight: 100;
   color: #fff;
+  overflow: 2;
 `;
 
 export const Loding = styled.div`
@@ -32,8 +33,8 @@ export const List = styled.ul`
   flex-wrap: wrap;
   justify-content: center;
   gap: 17px;
-  width: 1300px;
-  margin: 80px 0;
+  width: 900px;
+  margin: 60px 0;
 `;
 
 export const Item = styled.li`
@@ -49,8 +50,8 @@ export const Item = styled.li`
   }
 `;
 
-export const Image = styled.img`
+export const Image = styled.img<{ objectFit?: CSSProperties["objectFit"] }>`
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  ${({ objectFit }) => objectFit && `object-fit: ${objectFit};`}
 `;

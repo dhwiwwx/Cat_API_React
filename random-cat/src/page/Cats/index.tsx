@@ -1,4 +1,4 @@
-import React, { useEffect, useState, Suspense } from "react";
+import React, { useEffect, useState, Suspense, Fragment } from "react";
 import { getCats, GetCatsResponse } from "../../api/getCats";
 import { useQuery } from "react-query";
 import Button from "../../components/Button";
@@ -12,11 +12,23 @@ function Cats() {
 
   const [isOpen, setIsOpen] = useState<boolean>(false);
 
-  const { data, isFetching, refetch } = useQuery(["cats"], getCats);
+  const [modalImgUrl, setModalImgUrl] = useState<string>("");
+
+  const { data, isFetching, refetch } = useQuery(["cats"], getCats, {
+    refetchOnWindowFocus: false,
+  });
 
   const refresh = () => refetch();
 
-  const handleCloseModal = () => setIsOpen(false);
+  const handleOpenModal = (url: string) => {
+    setModalImgUrl(url);
+    setIsOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setModalImgUrl("");
+    setIsOpen(false);
+  };
 
   useEffect(() => {
     if (!data) return;
@@ -28,12 +40,13 @@ function Cats() {
       {isFetching && <Loding>로딩중...</Loding>}
       {!isFetching && data && (
         <List>
-          {cats.map(({ id, url }) => {
-            const handleOpenModal = () => setIsOpen(true);
+          {cats.map(({ id, url }, index) => {
+            if (index >= 9) return <Fragment key={id} />;
+            const ItemClick = () => handleOpenModal(url);
 
             return (
-              <Item key={id} onClick={handleOpenModal}>
-                <Image src={url} alt={id} />
+              <Item key={id} onClick={ItemClick}>
+                <Image src={url} alt={id} objectFit={"cover"} />
               </Item>
             );
           })}
@@ -43,7 +56,14 @@ function Cats() {
         isOpen={isOpen}
         shouldCloseOnOverlayClick={true}
         onRequestClose={handleCloseModal}
-      ></Modal>
+        style={{
+          content: {
+            overflow: "hidden",
+          },
+        }}
+      >
+        <Image src={modalImgUrl} alt="modal-img" objectFit={"contain"} />
+      </Modal>
       <Button onClick={refresh}>Reset</Button>
     </Container>
   );
